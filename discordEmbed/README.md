@@ -58,4 +58,4 @@ actionban = python3 /config/fail2ban/Fail2Ban.py -a ban -j <name> -i <ip> -t <ba
 
 ## Example
 
-![Example picture](.assets/Example.png)1
+![Example picture](.assets/Example.png)
