@@ -79,6 +79,7 @@ jobs:
           push: true
           platforms: ${{ steps.prep.outputs.platform }}
           file: ./discordEmbed/Dockerfile
+          context: ./discordEmbed
           tags: |
             ${{ steps.prep.outputs.tag }}
             ghcr.io/${{ steps.prep.outputs.tag }}
