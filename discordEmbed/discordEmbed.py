@@ -51,7 +51,7 @@ def createPayload(args):
 
         data = getGeoData(args)
 
-        if data.get('map_embed'):
+        if ip is not None:
             embed["url"] = "https://db-ip.com/" + ip
             embed["fields"] = [{"name": f":flag_{data['iso'].lower()}:", "value": data["city"]
                                 or data["name"], "inline": True}]
