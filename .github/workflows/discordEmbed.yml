@@ -19,7 +19,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
 
       - name: Lint Dockerfile
-        uses: brpaz/hadolint-action@master
+        uses: brpaz/hadolint-action@v1.1.0
         with:
           dockerfile: "discordEmbed/Dockerfile"
 
@@ -55,10 +55,11 @@ jobs:
           ARCHITECTURE=${{ matrix.architecture }}
           USER="$(echo ${GITHUB_REPOSITORY_OWNER} | tr '[:upper:]' '[:lower:]')"
           REPO="$(echo ${GITHUB_REPOSITORY} | tr '[:upper:]' '[:lower:]')"
+          echo ::set-output name=repo::${REPO}
           echo ::set-output name=action::${ACTION}
           echo ::set-output name=user_name::${USER}
           echo ::set-output name=platform::${ARCHITECTURE//-/\/}
-          echo ::set-output name=tag::${REPO}:${ACTION}-${GITHUB_REF//refs\/heads\//}-${GITHUB_SHA:0:8}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }}
+          echo ::set-output name=tag::${REPO}:${ACTION}-${GITHUB_REF//refs\/heads\//}-${GITHUB_RUN_NUMBER}-${{ matrix.architecture }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -118,7 +119,7 @@ jobs:
           SOURCE=${IMAGE}:${TAG}-${GITHUB_RUN_NUMBER}
           docker manifest create ${IMAGE}:${TAG}                                    --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
           docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
-          docker manifest create ${IMAGE}:discordembed                              --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker manifest create ${IMAGE}:${{ needs.build.outputs.action }}         --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${{ needs.build.outputs.action }}
 
       - name: Create manifests for GitHub Container Registry
         env:
@@ -129,4 +130,4 @@ jobs:
           SOURCE=${IMAGE}:${TAG}-${GITHUB_RUN_NUMBER}
           docker manifest create ${IMAGE}:${TAG}                                    --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}
           docker manifest create ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}                  --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${TAG}-${GITHUB_SHA:0:8}
-          docker manifest create ${IMAGE}:discordembed                              --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:latest
+          docker manifest create ${IMAGE}:${{ needs.build.outputs.action }}         --amend ${SOURCE}-linux-amd64 --amend ${SOURCE}-linux-arm-v7 --amend ${SOURCE}-linux-arm64 && docker manifest push ${IMAGE}:${{ needs.build.outputs.action }}
